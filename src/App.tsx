@@ -41,6 +41,7 @@ import { useState } from 'react';
 import DragAndDropConfirmDialog from './components/DragAndDropConfirmDialog.tsx';
 import RecurringEventDialog from './components/RecurringEventDialog.tsx';
 import { useCalendarView } from './hooks/useCalendarView.ts';
+import { useDragAndDrop } from './hooks/useDragAndDrop.ts';
 import { useEventForm } from './hooks/useEventForm.ts';
 import { useEventOperations } from './hooks/useEventOperations.ts';
 import { useNotifications } from './hooks/useNotifications.ts';
@@ -166,17 +167,23 @@ function App() {
   const [recurringEditMode, setRecurringEditMode] = useState<boolean | null>(null); // true = single, false = all
   const [recurringDialogMode, setRecurringDialogMode] = useState<'edit' | 'delete'>('edit');
 
-  // Drag and Drop states
-  const [draggedEvent, setDraggedEvent] = useState<Event | null>(null);
-  const [isDragConfirmOpen, setIsDragConfirmOpen] = useState(false);
-  const [pendingDrop, setPendingDrop] = useState<{
-    event: Event;
-    newDate: string;
-    newStartTime: string;
-    newEndTime: string;
-  } | null>(null);
-
   const { enqueueSnackbar } = useSnackbar();
+
+  // Drag and Drop hook
+  const {
+    draggedEvent,
+    isDragConfirmOpen,
+    pendingDrop,
+    handleDragStart,
+    handleDragOver,
+    handleDrop,
+    handleDragConfirm,
+    handleDragCancel,
+    resetDragState,
+  } = useDragAndDrop(events, saveEvent, (overlapping) => {
+    setOverlappingEvents(overlapping);
+    setIsOverlapDialogOpen(true);
+  });
 
   const handleRecurringConfirm = async (editSingleOnly: boolean) => {
     if (recurringDialogMode === 'edit' && pendingRecurringEdit) {
@@ -225,69 +232,6 @@ function App() {
       // Regular event deletion
       deleteEvent(event.id);
     }
-  };
-
-  // Drag and Drop handlers
-  const handleDragStart = (event: Event) => {
-    setDraggedEvent(event);
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
-
-  const handleDrop = (targetDate: string) => {
-    if (!draggedEvent) return;
-
-    // 날짜만 변경, 시간은 유지
-    setPendingDrop({
-      event: draggedEvent,
-      newDate: targetDate,
-      newStartTime: draggedEvent.startTime,
-      newEndTime: draggedEvent.endTime,
-    });
-    setIsDragConfirmOpen(true);
-  };
-
-  const handleDragConfirm = async () => {
-    if (!pendingDrop) return;
-
-    const { event, newDate, newStartTime, newEndTime } = pendingDrop;
-
-    // 반복 일정인 경우 단일 일정으로 변환
-    const updatedEvent: Event = {
-      ...event,
-      date: newDate,
-      startTime: newStartTime,
-      endTime: newEndTime,
-      repeat: event.repeat.type !== 'none' ? { type: 'none', interval: 1 } : event.repeat,
-    };
-
-    // 겹침 검사
-    const overlapping = findOverlappingEvents(updatedEvent, events);
-    if (overlapping.length > 0) {
-      setIsDragConfirmOpen(false);
-      setOverlappingEvents(overlapping);
-      setIsOverlapDialogOpen(true);
-      // 겹침 다이얼로그에서 "계속"을 선택하면 저장
-      return;
-    }
-
-    try {
-      await saveEvent(updatedEvent);
-    } catch (error) {
-      console.error(error);
-    }
-
-    setIsDragConfirmOpen(false);
-    setPendingDrop(null);
-    setDraggedEvent(null);
-  };
-
-  const handleDragCancel = () => {
-    setIsDragConfirmOpen(false);
-    setPendingDrop(null);
-    setDraggedEvent(null);
   };
 
   const addOrUpdateEvent = async () => {
@@ -891,8 +835,7 @@ function App() {
           setIsOverlapDialogOpen(false);
           // 드래그 앤 드롭 취소
           if (pendingDrop) {
-            setPendingDrop(null);
-            setDraggedEvent(null);
+            resetDragState();
           }
         }}
       >
@@ -912,8 +855,7 @@ function App() {
               setIsOverlapDialogOpen(false);
               // 드래그 앤 드롭 취소
               if (pendingDrop) {
-                setPendingDrop(null);
-                setDraggedEvent(null);
+                resetDragState();
               }
             }}
           >
@@ -921,7 +863,7 @@ function App() {
           </Button>
           <Button
             color="error"
-            onClick={() => {
+            onClick={async () => {
               setIsOverlapDialogOpen(false);
               // 드래그 앤 드롭인 경우
               if (pendingDrop) {
@@ -934,10 +876,8 @@ function App() {
                   repeat:
                     event.repeat.type !== 'none' ? { type: 'none', interval: 1 } : event.repeat,
                 };
-                saveEvent(updatedEvent);
-                setIsDragConfirmOpen(false);
-                setPendingDrop(null);
-                setDraggedEvent(null);
+                await saveEvent(updatedEvent);
+                resetDragState();
               } else {
                 // 일반 일정 추가/수정
                 saveEvent({

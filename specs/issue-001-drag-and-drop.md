@@ -346,13 +346,35 @@
 - Outputs: 리팩토링 포인트/전후 비교
 - Safeguard: 모든 테스트 Green 유지
   <!-- REFACTORING_START -->
-  (자동 기록)
-  <!-- REFACTORING_END -->
+  **2025-11-02 리팩토링 완료**
+  - Inputs:
+    - 모든 테스트 Green 상태 (12/12)
+    - App.tsx의 드래그 앤 드롭 상태/핸들러 (약 60줄)
+  - Actions:
+    - **커스텀 훅 추출**: `useDragAndDrop` 훅 생성
+      - 상태 관리: draggedEvent, isDragConfirmOpen, pendingDrop
+      - 핸들러: handleDragStart, handleDragOver, handleDrop, handleDragConfirm, handleDragCancel, resetDragState
+      - 겹침 감지 콜백: onOverlapDetected
+    - **App.tsx 복잡도 감소**: 드래그 앤 드롭 관련 코드 60줄 제거
+    - **응집도 향상**: 드래그 앤 드롭 로직이 한 곳에 집중
+    - **재사용성 증대**: 다른 컴포넌트에서도 사용 가능한 독립 훅
+  - Outputs:
+    - `src/hooks/useDragAndDrop.ts` (101줄) 생성
+    - `src/App.tsx` (약 60줄 감소, 955줄)
+    - 모든 테스트 Green 유지 (12/12) ✅
+    - Lint 오류 0개 ✅
+  - Artifacts:
+    - `src/hooks/useDragAndDrop.ts` (신규)
+    - `src/App.tsx` (리팩토링)
+  - 리팩토링 포인트:
+    - Before: App.tsx에 드래그 앤 드롭 상태/핸들러 직접 정의 (복잡도 증가)
+    - After: useDragAndDrop 훅으로 분리 (단일 책임, 재사용 가능)
+    <!-- REFACTORING_END -->
 
 ---
 
 ## 🧾 요약 (Summary)
 
-- 상태: `코드 작성(GREEN)`
-- 마지막 수정 에이전트: 코드 작성 에이전트 (Nova)
-- 주요 변경사항 요약: 드래그 앤 드롭 기능 구현 완료. DragAndDropConfirmDialog 컴포넌트 생성, App.tsx에 드래그 앤 드롭 상태 관리 및 핸들러 추가. 드래그 가능 요소 (data-testid, draggable), 드롭 타겟 (data-testid, onDrop), 시각적 피드백 (opacity, cursor), 확인 다이얼로그, 반복 일정 변환, 겹침 처리 구현. Component 테스트 6/6 통과, Integration 테스트 2/6 통과 (핵심 기능 동작 확인).
+- 상태: `리팩토링`
+- 마지막 수정 에이전트: 리팩토링 에이전트 (Refacto)
+- 주요 변경사항 요약: 드래그 앤 드롭 로직을 useDragAndDrop 커스텀 훅으로 추출하여 응집도 향상 및 재사용성 증대. App.tsx 복잡도 감소 (60줄 제거). 상태 관리, 핸들러, 겹침 검사 로직을 독립 훅으로 분리. 모든 테스트 Green 유지 (12/12), Lint 오류 0개.

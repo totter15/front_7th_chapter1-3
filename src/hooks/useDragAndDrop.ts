@@ -1,3 +1,4 @@
+import { useSnackbar } from 'notistack';
 import { useState } from 'react';
 
 import { Event } from '../types';
@@ -10,11 +11,21 @@ interface PendingDrop {
   newEndTime: string;
 }
 
+// 메시지 상수
+const SUCCESS_MESSAGES = {
+  EVENT_UPDATED: '일정이 수정되었습니다',
+} as const;
+
+const ERROR_MESSAGES = {
+  SAVE_FAILED: '일정 저장 실패',
+} as const;
+
 export const useDragAndDrop = (
   events: Event[],
-  saveEvent: (event: Event) => Promise<void>,
+  fetchEvents: () => Promise<void>,
   onOverlapDetected: (overlapping: Event[]) => void
 ) => {
+  const { enqueueSnackbar } = useSnackbar();
   const [draggedEvent, setDraggedEvent] = useState<Event | null>(null);
   const [isDragConfirmOpen, setIsDragConfirmOpen] = useState(false);
   const [pendingDrop, setPendingDrop] = useState<PendingDrop | null>(null);
@@ -63,9 +74,22 @@ export const useDragAndDrop = (
     }
 
     try {
-      await saveEvent(updatedEvent);
+      // 드래그 앤 드롭은 항상 수정(PUT)이므로 직접 API 호출
+      const response = await fetch(`/api/events/${updatedEvent.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedEvent),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save event');
+      }
+
+      await fetchEvents();
+      enqueueSnackbar(SUCCESS_MESSAGES.EVENT_UPDATED, { variant: 'success' });
     } catch (error) {
       console.error(error);
+      enqueueSnackbar(ERROR_MESSAGES.SAVE_FAILED, { variant: 'error' });
     }
 
     setIsDragConfirmOpen(false);
@@ -84,6 +108,40 @@ export const useDragAndDrop = (
     setDraggedEvent(null);
   };
 
+  const handleOverlapConfirm = async () => {
+    if (!pendingDrop) return;
+
+    const { event, newDate, newStartTime, newEndTime } = pendingDrop;
+
+    const updatedEvent: Event = {
+      ...event,
+      date: newDate,
+      startTime: newStartTime,
+      endTime: newEndTime,
+      repeat: event.repeat.type !== 'none' ? { type: 'none', interval: 1 } : event.repeat,
+    };
+
+    try {
+      const response = await fetch(`/api/events/${updatedEvent.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedEvent),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save event');
+      }
+
+      await fetchEvents();
+      enqueueSnackbar(SUCCESS_MESSAGES.EVENT_UPDATED, { variant: 'success' });
+    } catch (error) {
+      console.error(error);
+      enqueueSnackbar(ERROR_MESSAGES.SAVE_FAILED, { variant: 'error' });
+    }
+
+    resetDragState();
+  };
+
   return {
     draggedEvent,
     isDragConfirmOpen,
@@ -94,6 +152,6 @@ export const useDragAndDrop = (
     handleDragConfirm,
     handleDragCancel,
     resetDragState,
+    handleOverlapConfirm,
   };
 };
-

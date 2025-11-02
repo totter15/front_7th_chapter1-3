@@ -52,15 +52,13 @@ describe('DragAndDropConfirmDialog 컴포넌트 테스트', () => {
       expect(screen.getByText('일정 이동 확인')).toBeInTheDocument();
 
       // 일정 제목 표시
-      expect(screen.getByText('테스트 회의')).toBeInTheDocument();
+      expect(screen.getByText(/일정:.*테스트 회의/)).toBeInTheDocument();
 
       // 변경 전 정보 표시
-      expect(screen.getByText(/2025-10-15/)).toBeInTheDocument();
-      expect(screen.getByText(/09:00.*10:00/)).toBeInTheDocument();
+      expect(screen.getByText(/변경 전:.*2025-10-15.*09:00.*10:00/)).toBeInTheDocument();
 
       // 변경 후 정보 표시
-      expect(screen.getByText(/2025-10-16/)).toBeInTheDocument();
-      expect(screen.getByText(/10:00.*11:00/)).toBeInTheDocument();
+      expect(screen.getByText(/변경 후:.*2025-10-16.*10:00.*11:00/)).toBeInTheDocument();
 
       // 버튼 확인
       expect(screen.getByRole('button', { name: '저장' })).toBeInTheDocument();

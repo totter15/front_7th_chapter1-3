@@ -180,7 +180,8 @@ function App() {
     handleDragConfirm,
     handleDragCancel,
     resetDragState,
-  } = useDragAndDrop(events, saveEvent, (overlapping) => {
+    handleOverlapConfirm,
+  } = useDragAndDrop(events, fetchEvents, (overlapping) => {
     setOverlappingEvents(overlapping);
     setIsOverlapDialogOpen(true);
   });
@@ -867,17 +868,7 @@ function App() {
               setIsOverlapDialogOpen(false);
               // 드래그 앤 드롭인 경우
               if (pendingDrop) {
-                const { event, newDate, newStartTime, newEndTime } = pendingDrop;
-                const updatedEvent: Event = {
-                  ...event,
-                  date: newDate,
-                  startTime: newStartTime,
-                  endTime: newEndTime,
-                  repeat:
-                    event.repeat.type !== 'none' ? { type: 'none', interval: 1 } : event.repeat,
-                };
-                await saveEvent(updatedEvent);
-                resetDragState();
+                await handleOverlapConfirm();
               } else {
                 // 일반 일정 추가/수정
                 saveEvent({

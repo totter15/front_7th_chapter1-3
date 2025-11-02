@@ -76,16 +76,17 @@ describe('드래그 앤 드롭 워크플로우 통합 테스트', () => {
       fireEvent.drop(targetDateCell);
 
       // 확인 다이얼로그가 표시되는지 확인
-      expect(await screen.findByText('일정 이동 확인')).toBeInTheDocument();
-      expect(screen.getByText(/2025-10-15/)).toBeInTheDocument();
-      expect(screen.getByText(/2025-10-16/)).toBeInTheDocument();
+      const dialog = await screen.findByRole('dialog');
+      expect(within(dialog).getByText('일정 이동 확인')).toBeInTheDocument();
+      expect(within(dialog).getByText(/2025-10-15/)).toBeInTheDocument();
+      expect(within(dialog).getByText(/2025-10-16/)).toBeInTheDocument();
 
       // 저장 버튼 클릭
       const saveButton = screen.getByRole('button', { name: '저장' });
       await user.click(saveButton);
 
       // 성공 토스트 확인
-      expect(await screen.findByText('일정이 수정되었습니다.')).toBeInTheDocument();
+      expect(await screen.findByText('일정이 수정되었습니다')).toBeInTheDocument();
 
       // 일정이 새 날짜에 표시되는지 확인
       const updatedEventList = within(screen.getByTestId('event-list'));
@@ -136,7 +137,7 @@ describe('드래그 앤 드롭 워크플로우 통합 테스트', () => {
       expect(eventList.getByText('2025-10-15')).toBeInTheDocument();
 
       // API 호출이 없었는지 확인 (토스트 메시지가 표시되지 않음)
-      expect(screen.queryByText('일정이 수정되었습니다.')).not.toBeInTheDocument();
+      expect(screen.queryByText('일정이 수정되었습니다')).not.toBeInTheDocument();
     });
   });
 
@@ -160,6 +161,7 @@ describe('드래그 앤 드롭 워크플로우 통합 테스트', () => {
       setupMockHandlerUpdating(initialEvents);
 
       const { user } = setup(<App />);
+
       await screen.findByText('일정 로딩 완료!');
 
       // 반복 일정 드래그 앤 드롭
@@ -170,19 +172,21 @@ describe('드래그 앤 드롭 워크플로우 통합 테스트', () => {
       fireEvent.drop(targetDateCell);
 
       // 확인 다이얼로그에 반복 일정 변환 안내 표시
-      expect(await screen.findByText('일정 이동 확인')).toBeInTheDocument();
-      expect(screen.getByText(/반복 일정이 단일 일정으로 변환됩니다/)).toBeInTheDocument();
+      const dialog = await screen.findByRole('dialog');
+      expect(within(dialog).getByText('일정 이동 확인')).toBeInTheDocument();
+      expect(within(dialog).getByText(/반복 일정이 단일 일정으로 변환됩니다/)).toBeInTheDocument();
 
       // 저장 버튼 클릭
       const saveButton = screen.getByRole('button', { name: '저장' });
       await user.click(saveButton);
 
       // 성공 토스트 확인
-      expect(await screen.findByText('일정이 수정되었습니다.')).toBeInTheDocument();
+      expect(await screen.findByText('일정이 수정되었습니다')).toBeInTheDocument();
 
       // 일정이 단일 일정으로 변경되었는지 확인 (반복 아이콘이 사라짐)
       const eventList = within(screen.getByTestId('event-list'));
-      const eventRow = eventList.getByText('반복 회의').closest('tr');
+      const eventRow = eventList.getByText('반복 회의').closest('div');
+      // Repeat 아이콘이 사라졌는지 확인
       expect(within(eventRow!).queryByTestId('RepeatIcon')).not.toBeInTheDocument();
     });
   });
@@ -233,14 +237,14 @@ describe('드래그 앤 드롭 워크플로우 통합 테스트', () => {
       await user.click(saveButton);
 
       // 겹침 경고 다이얼로그 확인
-      expect(await screen.findByText(/일정이 겹칩니다/)).toBeInTheDocument();
+      expect(await screen.findByText(/다음 일정과 겹칩니다/)).toBeInTheDocument();
 
-      // 계속 버튼 클릭
-      const continueButton = screen.getByRole('button', { name: '계속' });
+      // 계속 진행 버튼 클릭
+      const continueButton = screen.getByRole('button', { name: '계속 진행' });
       await user.click(continueButton);
 
       // 저장 성공 토스트 확인
-      expect(await screen.findByText('일정이 수정되었습니다.')).toBeInTheDocument();
+      expect(await screen.findByText('일정이 수정되었습니다')).toBeInTheDocument();
     });
   });
 
@@ -316,7 +320,7 @@ describe('드래그 앤 드롭 워크플로우 통합 테스트', () => {
       await user.click(saveButton);
 
       // 에러 토스트 확인
-      expect(await screen.findByText('일정 수정 실패')).toBeInTheDocument();
+      expect(await screen.findByText('일정 저장 실패')).toBeInTheDocument();
 
       // 일정이 원래 위치에 유지되는지 확인
       const eventList = within(screen.getByTestId('event-list'));

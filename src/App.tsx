@@ -166,6 +166,7 @@ function App() {
   const [pendingRecurringDelete, setPendingRecurringDelete] = useState<Event | null>(null);
   const [recurringEditMode, setRecurringEditMode] = useState<boolean | null>(null); // true = single, false = all
   const [recurringDialogMode, setRecurringDialogMode] = useState<'edit' | 'delete'>('edit');
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -233,6 +234,17 @@ function App() {
       // Regular event deletion
       deleteEvent(event.id);
     }
+  };
+
+  const handleDateCellClick = (dateString: string) => {
+    // 편집 모드 초기화
+    setEditingEvent(null);
+    // 폼 초기화
+    resetForm();
+    // 클릭한 날짜 설정
+    setDate(dateString);
+    // 선택된 날짜 설정 (시각적 피드백용)
+    setSelectedDate(dateString);
   };
 
   const addOrUpdateEvent = async () => {
@@ -333,8 +345,10 @@ function App() {
                     <TableCell
                       key={date.toISOString()}
                       data-testid={`drop-target-${dateString}`}
+                      data-selected={selectedDate === dateString ? 'true' : undefined}
                       onDragOver={handleDragOver}
                       onDrop={() => handleDrop(dateString)}
+                      onClick={() => handleDateCellClick(dateString)}
                       sx={{
                         height: '120px',
                         verticalAlign: 'top',
@@ -342,6 +356,8 @@ function App() {
                         padding: 1,
                         border: '1px solid #e0e0e0',
                         overflow: 'hidden',
+                        backgroundColor: selectedDate === dateString ? '#e3f2fd' : undefined,
+                        cursor: 'pointer',
                       }}
                     >
                       <Typography variant="body2" fontWeight="bold">
@@ -433,8 +449,12 @@ function App() {
                       <TableCell
                         key={dayIndex}
                         data-testid={dateString ? `drop-target-${dateString}` : undefined}
+                        data-selected={
+                          dateString && selectedDate === dateString ? 'true' : undefined
+                        }
                         onDragOver={dateString ? handleDragOver : undefined}
                         onDrop={dateString ? () => handleDrop(dateString) : undefined}
+                        onClick={dateString ? () => handleDateCellClick(dateString) : undefined}
                         sx={{
                           height: '120px',
                           verticalAlign: 'top',
@@ -443,6 +463,9 @@ function App() {
                           border: '1px solid #e0e0e0',
                           overflow: 'hidden',
                           position: 'relative',
+                          backgroundColor:
+                            dateString && selectedDate === dateString ? '#e3f2fd' : undefined,
+                          cursor: dateString ? 'pointer' : undefined,
                         }}
                       >
                         {day && (

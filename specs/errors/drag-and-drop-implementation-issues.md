@@ -232,3 +232,4 @@ const continueButton = screen.getByRole('button', { name: '계속 진행' });
 - [ ] 공유 다이얼로그 사용 시 각 플로우별 상태 초기화 로직을 추가했는가?
 - [ ] testId를 사용하기 전에 해당 testId가 실제로 필요한지 확인했는가?
 
+

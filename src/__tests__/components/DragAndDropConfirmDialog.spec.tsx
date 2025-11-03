@@ -1,6 +1,7 @@
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
 
 import DragAndDropConfirmDialog from '../../components/DragAndDropConfirmDialog';
@@ -152,4 +153,3 @@ describe('DragAndDropConfirmDialog 컴포넌트 테스트', () => {
     });
   });
 });
-

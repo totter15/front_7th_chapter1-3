@@ -29,6 +29,9 @@ export const useNotifications = (events: Event[]) => {
   useEffect(() => {
     const interval = setInterval(checkUpcomingEvents, 1000); // 1초마다 체크
     return () => clearInterval(interval);
+    // checkUpcomingEvents는 events와 notifiedEvents에 의존하지만,
+    // 함수를 dependency에 추가하면 무한 루프 발생 가능
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [events, notifiedEvents]);
 
   return { notifications, notifiedEvents, setNotifications, removeNotification };

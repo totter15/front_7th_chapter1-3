@@ -1,5 +1,5 @@
 import { useSnackbar } from 'notistack';
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 import { Event } from '../types';
 import { findOverlappingEvents } from '../utils/eventOverlap';
@@ -23,7 +23,7 @@ const ERROR_MESSAGES = {
 export const useDragAndDrop = (
   events: Event[],
   fetchEvents: () => Promise<void>,
-  onOverlapDetected: (overlapping: Event[]) => void
+  onOverlapDetected: (_overlappingEvents: Event[]) => void
 ) => {
   const { enqueueSnackbar } = useSnackbar();
   const [draggedEvent, setDraggedEvent] = useState<Event | null>(null);

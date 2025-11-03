@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 interface UseDateSelectionProps {
-  onDateSelect: (dateString: string) => void;
+  onDateSelect: (_dateString: string) => void;
 }
 
 export const useDateSelection = ({ onDateSelect }: UseDateSelectionProps) => {
@@ -19,4 +19,3 @@ export const useDateSelection = ({ onDateSelect }: UseDateSelectionProps) => {
     handleDateCellClick,
   };
 };
-

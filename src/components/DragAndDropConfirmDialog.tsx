@@ -60,4 +60,3 @@ const DragAndDropConfirmDialog = ({
 };
 
 export default DragAndDropConfirmDialog;
-

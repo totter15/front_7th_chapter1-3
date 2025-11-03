@@ -41,6 +41,7 @@ import { useState } from 'react';
 import DragAndDropConfirmDialog from './components/DragAndDropConfirmDialog.tsx';
 import RecurringEventDialog from './components/RecurringEventDialog.tsx';
 import { useCalendarView } from './hooks/useCalendarView.ts';
+import { useDateSelection } from './hooks/useDateSelection.ts';
 import { useDragAndDrop } from './hooks/useDragAndDrop.ts';
 import { useEventForm } from './hooks/useEventForm.ts';
 import { useEventOperations } from './hooks/useEventOperations.ts';
@@ -166,9 +167,20 @@ function App() {
   const [pendingRecurringDelete, setPendingRecurringDelete] = useState<Event | null>(null);
   const [recurringEditMode, setRecurringEditMode] = useState<boolean | null>(null); // true = single, false = all
   const [recurringDialogMode, setRecurringDialogMode] = useState<'edit' | 'delete'>('edit');
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   const { enqueueSnackbar } = useSnackbar();
+
+  // Date selection hook
+  const { selectedDate, handleDateCellClick } = useDateSelection({
+    onDateSelect: (dateString: string) => {
+      // 편집 모드 초기화
+      setEditingEvent(null);
+      // 폼 초기화
+      resetForm();
+      // 클릭한 날짜 설정
+      setDate(dateString);
+    },
+  });
 
   // Drag and Drop hook
   const {
@@ -234,17 +246,6 @@ function App() {
       // Regular event deletion
       deleteEvent(event.id);
     }
-  };
-
-  const handleDateCellClick = (dateString: string) => {
-    // 편집 모드 초기화
-    setEditingEvent(null);
-    // 폼 초기화
-    resetForm();
-    // 클릭한 날짜 설정
-    setDate(dateString);
-    // 선택된 날짜 설정 (시각적 피드백용)
-    setSelectedDate(dateString);
   };
 
   const addOrUpdateEvent = async () => {

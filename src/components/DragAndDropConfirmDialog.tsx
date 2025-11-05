@@ -9,7 +9,7 @@ import {
 
 import { Event } from '../types';
 
-interface DragAndDropConfirmDialogProps {
+export interface DragAndDropConfirmDialogProps {
   open: boolean;
   event: Event | null;
   newDate: string;

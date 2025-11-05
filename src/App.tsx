@@ -39,12 +39,9 @@ import { Event, EventForm, RepeatType } from './types.ts';
 import { findOverlappingEvents } from './utils/eventOverlap.ts';
 import { getTimeErrorMessage } from './utils/timeValidation.ts';
 import Calendar from './components/Calendar.tsx';
+import EventBox from './components/EventBox.tsx';
 
-const categories = ['업무', '개인', '가족', '기타'];
-
-const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
-
-const notificationOptions = [
+export const notificationOptions = [
   { value: 1, label: '1분 전' },
   { value: 10, label: '10분 전' },
   { value: 60, label: '1시간 전' },
@@ -52,20 +49,9 @@ const notificationOptions = [
   { value: 1440, label: '1일 전' },
 ];
 
-const getRepeatTypeLabel = (type: RepeatType): string => {
-  switch (type) {
-    case 'daily':
-      return '일';
-    case 'weekly':
-      return '주';
-    case 'monthly':
-      return '월';
-    case 'yearly':
-      return '년';
-    default:
-      return '';
-  }
-};
+const categories = ['업무', '개인', '가족', '기타'];
+
+const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
 
 function App() {
   const {
@@ -552,66 +538,13 @@ function App() {
             <Typography>검색 결과가 없습니다.</Typography>
           ) : (
             filteredEvents.map((event) => (
-              <Box key={event.id} sx={{ border: 1, borderRadius: 2, p: 3, width: '100%' }}>
-                <Stack direction="row" justifyContent="space-between">
-                  <Stack>
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      {notifiedEvents.includes(event.id) && <Notifications color="error" />}
-                      {event.repeat.type !== 'none' && (
-                        <Tooltip
-                          title={`${event.repeat.interval}${getRepeatTypeLabel(
-                            event.repeat.type
-                          )}마다 반복${
-                            event.repeat.endDate ? ` (종료: ${event.repeat.endDate})` : ''
-                          }`}
-                        >
-                          <Repeat fontSize="small" />
-                        </Tooltip>
-                      )}
-                      <Typography
-                        fontWeight={notifiedEvents.includes(event.id) ? 'bold' : 'normal'}
-                        color={notifiedEvents.includes(event.id) ? 'error' : 'inherit'}
-                      >
-                        {event.title}
-                      </Typography>
-                    </Stack>
-                    <Typography>{event.date}</Typography>
-                    <Typography>
-                      {event.startTime} - {event.endTime}
-                    </Typography>
-                    <Typography>{event.description}</Typography>
-                    <Typography>{event.location}</Typography>
-                    <Typography>카테고리: {event.category}</Typography>
-                    {event.repeat.type !== 'none' && (
-                      <Typography>
-                        반복: {event.repeat.interval}
-                        {event.repeat.type === 'daily' && '일'}
-                        {event.repeat.type === 'weekly' && '주'}
-                        {event.repeat.type === 'monthly' && '월'}
-                        {event.repeat.type === 'yearly' && '년'}
-                        마다
-                        {event.repeat.endDate && ` (종료: ${event.repeat.endDate})`}
-                      </Typography>
-                    )}
-                    <Typography>
-                      알림:{' '}
-                      {
-                        notificationOptions.find(
-                          (option) => option.value === event.notificationTime
-                        )?.label
-                      }
-                    </Typography>
-                  </Stack>
-                  <Stack>
-                    <IconButton aria-label="Edit event" onClick={() => handleEditEvent(event)}>
-                      <Edit />
-                    </IconButton>
-                    <IconButton aria-label="Delete event" onClick={() => handleDeleteEvent(event)}>
-                      <Delete />
-                    </IconButton>
-                  </Stack>
-                </Stack>
-              </Box>
+              <EventBox
+                key={event.id}
+                event={event}
+                isNotifiedEvent={notifiedEvents.includes(event.id)}
+                handleEditEvent={handleEditEvent}
+                handleDeleteEvent={handleDeleteEvent}
+              />
             ))
           )}
         </Stack>

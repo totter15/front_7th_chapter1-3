@@ -4,9 +4,7 @@ import {
   AlertTitle,
   Box,
   Button,
-  Checkbox,
   FormControl,
-  FormControlLabel,
   FormLabel,
   IconButton,
   Stack,
@@ -35,6 +33,7 @@ import EventBox from './components/EventBox.tsx';
 import OverlappingConfirmDialog from './components/OverlappingConfirmDialog.tsx';
 import InputForm from './components/InputForm.tsx';
 import SelectForm from './components/SelectForm.tsx';
+import CheckboxForm from './components/CheckboxForm.tsx';
 
 export const notificationOptions = [
   { value: 1, label: '1분 전' },
@@ -411,25 +410,18 @@ function App() {
           />
 
           {!editingEvent && (
-            <FormControl>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={isRepeating}
-                    onChange={(e) => {
-                      const checked = e.target.checked;
-                      setIsRepeating(checked);
-                      if (checked) {
-                        setRepeatType('daily');
-                      } else {
-                        setRepeatType('none');
-                      }
-                    }}
-                  />
+            <CheckboxForm
+              checked={isRepeating}
+              onChange={(checked) => {
+                setIsRepeating(checked);
+                if (checked) {
+                  setRepeatType('daily');
+                } else {
+                  setRepeatType('none');
                 }
-                label="반복 일정"
-              />
-            </FormControl>
+              }}
+              label="반복 일정"
+            />
           )}
 
           {/* ! TEST CASE */}

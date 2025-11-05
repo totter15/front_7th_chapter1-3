@@ -1,8 +1,6 @@
-import { useSnackbar } from 'notistack';
 import React, { useState } from 'react';
 
 import { Event } from '../types';
-import { findOverlappingEvents } from '../utils/eventOverlap';
 
 interface PendingDrop {
   event: Event;
@@ -11,23 +9,32 @@ interface PendingDrop {
   newEndTime: string;
 }
 
-// 메시지 상수
-const SUCCESS_MESSAGES = {
-  EVENT_UPDATED: '일정이 수정되었습니다',
-} as const;
-
-const ERROR_MESSAGES = {
-  SAVE_FAILED: '일정 저장 실패',
-} as const;
+const createUpdatedEvent = ({
+  event,
+  newDate,
+  newStartTime,
+  newEndTime,
+}: {
+  event: Event;
+  newDate: string;
+  newStartTime: string;
+  newEndTime: string;
+}): Event => {
+  return {
+    ...event,
+    date: newDate,
+    startTime: newStartTime,
+    endTime: newEndTime,
+    repeat: event.repeat.type !== 'none' ? { type: 'none', interval: 1 } : event.repeat,
+  };
+};
 
 export const useDragAndDrop = (
-  events: Event[],
-  fetchEvents: () => Promise<void>,
-  onOverlapDetected: (_overlappingEvents: Event[]) => void
+  onConfirm: (updatedEvent: Event) => Promise<void>,
+  onConfirmOpen: (updatedEvent: Event) => void,
+  onConfirmClose: () => void
 ) => {
-  const { enqueueSnackbar } = useSnackbar();
   const [draggedEvent, setDraggedEvent] = useState<Event | null>(null);
-  const [isDragConfirmOpen, setIsDragConfirmOpen] = useState(false);
   const [pendingDrop, setPendingDrop] = useState<PendingDrop | null>(null);
 
   const handleDragStart = (event: Event) => {
@@ -42,65 +49,37 @@ export const useDragAndDrop = (
     if (!draggedEvent) return;
 
     // 날짜만 변경, 시간은 유지
-    setPendingDrop({
+    const dropInfo = {
       event: draggedEvent,
       newDate: targetDate,
       newStartTime: draggedEvent.startTime,
       newEndTime: draggedEvent.endTime,
-    });
-    setIsDragConfirmOpen(true);
-  };
-
-  const handleDragConfirm = async () => {
-    if (!pendingDrop) return;
-
-    const { event, newDate, newStartTime, newEndTime } = pendingDrop;
-
-    // 반복 일정인 경우 단일 일정으로 변환
-    const updatedEvent: Event = {
-      ...event,
-      date: newDate,
-      startTime: newStartTime,
-      endTime: newEndTime,
-      repeat: event.repeat.type !== 'none' ? { type: 'none', interval: 1 } : event.repeat,
     };
 
-    // 겹침 검사
-    const overlapping = findOverlappingEvents(updatedEvent, events);
-    if (overlapping.length > 0) {
-      setIsDragConfirmOpen(false);
-      onOverlapDetected(overlapping);
-      return;
-    }
+    setPendingDrop(dropInfo);
 
-    try {
-      // 드래그 앤 드롭은 항상 수정(PUT)이므로 직접 API 호출
-      const response = await fetch(`/api/events/${updatedEvent.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedEvent),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to save event');
-      }
-
-      await fetchEvents();
-      enqueueSnackbar(SUCCESS_MESSAGES.EVENT_UPDATED, { variant: 'success' });
-    } catch (error) {
-      console.error(error);
-      enqueueSnackbar(ERROR_MESSAGES.SAVE_FAILED, { variant: 'error' });
-    }
-
-    setIsDragConfirmOpen(false);
-    setPendingDrop(null);
-    setDraggedEvent(null);
+    const updatedEvent = createUpdatedEvent(dropInfo);
+    onConfirmOpen(updatedEvent);
   };
 
+  /**
+   * 드래그 확인 다이얼로그에서 확인 버튼 클릭 시 호출되는 핸들러
+   */
+  const handleDragConfirm = async () => {
+    if (!pendingDrop) return;
+    const updatedEvent = createUpdatedEvent(pendingDrop);
+
+    await onConfirm(updatedEvent);
+    onConfirmClose();
+    resetDragState();
+  };
+
+  /**
+   * 드래그 확인 다이얼로그에서 취소 버튼 클릭 시 호출되는 핸들러
+   */
   const handleDragCancel = () => {
-    setIsDragConfirmOpen(false);
-    setPendingDrop(null);
-    setDraggedEvent(null);
+    onConfirmClose();
+    resetDragState();
   };
 
   const resetDragState = () => {
@@ -108,43 +87,21 @@ export const useDragAndDrop = (
     setDraggedEvent(null);
   };
 
+  /**
+   * 겹침 경고 다이얼로그에서 확인 버튼 클릭 시 호출되는 핸들러
+   * 겹침을 무시하고 이벤트를 저장합니다.
+   */
   const handleOverlapConfirm = async () => {
     if (!pendingDrop) return;
 
-    const { event, newDate, newStartTime, newEndTime } = pendingDrop;
+    const updatedEvent = createUpdatedEvent(pendingDrop);
 
-    const updatedEvent: Event = {
-      ...event,
-      date: newDate,
-      startTime: newStartTime,
-      endTime: newEndTime,
-      repeat: event.repeat.type !== 'none' ? { type: 'none', interval: 1 } : event.repeat,
-    };
-
-    try {
-      const response = await fetch(`/api/events/${updatedEvent.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedEvent),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to save event');
-      }
-
-      await fetchEvents();
-      enqueueSnackbar(SUCCESS_MESSAGES.EVENT_UPDATED, { variant: 'success' });
-    } catch (error) {
-      console.error(error);
-      enqueueSnackbar(ERROR_MESSAGES.SAVE_FAILED, { variant: 'error' });
-    }
-
+    await onConfirm(updatedEvent);
     resetDragState();
   };
 
   return {
     draggedEvent,
-    isDragConfirmOpen,
     pendingDrop,
     handleDragStart,
     handleDragOver,

@@ -19,7 +19,7 @@ const SUCCESS_MESSAGES = {
   EVENTS_LOADED: '일정 로딩 완료!',
 } as const;
 
-export const useEventOperations = (editing: boolean, onSave?: () => void) => {
+export const useEventOperations = (onSave?: () => void) => {
   const [events, setEvents] = useState<Event[]>([]);
   const { enqueueSnackbar } = useSnackbar();
 
@@ -37,32 +37,13 @@ export const useEventOperations = (editing: boolean, onSave?: () => void) => {
     }
   };
 
-  const saveEvent = async (eventData: Event | EventForm) => {
+  const saveEvent = async (eventData: EventForm) => {
     try {
-      let response;
-      if (editing) {
-        const editingEvent = {
-          ...eventData,
-          // ! TEST CASE
-          repeat: eventData.repeat ?? {
-            type: 'none',
-            interval: 0,
-            endDate: '',
-          },
-        };
-
-        response = await fetch(`/api/events/${(eventData as Event).id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(editingEvent),
-        });
-      } else {
-        response = await fetch('/api/events', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(eventData),
-        });
-      }
+      const response = await fetch('/api/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(eventData),
+      });
 
       if (!response.ok) {
         throw new Error('Failed to save event');
@@ -70,11 +51,40 @@ export const useEventOperations = (editing: boolean, onSave?: () => void) => {
 
       await fetchEvents();
       onSave?.();
-      enqueueSnackbar(editing ? SUCCESS_MESSAGES.EVENT_UPDATED : SUCCESS_MESSAGES.EVENT_ADDED, {
-        variant: 'success',
-      });
+      enqueueSnackbar(SUCCESS_MESSAGES.EVENT_ADDED, { variant: 'success' });
     } catch (error) {
       console.error('Error saving event:', error);
+      enqueueSnackbar(ERROR_MESSAGES.SAVE_FAILED, { variant: 'error' });
+    }
+  };
+
+  const editEvent = async (eventData: Event) => {
+    try {
+      const editingEvent = {
+        ...eventData,
+        // ! TEST CASE
+        repeat: eventData.repeat ?? {
+          type: 'none',
+          interval: 0,
+          endDate: '',
+        },
+      };
+
+      const response = await fetch(`/api/events/${eventData.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editingEvent),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update event');
+      }
+
+      await fetchEvents();
+      onSave?.();
+      enqueueSnackbar(SUCCESS_MESSAGES.EVENT_UPDATED, { variant: 'success' });
+    } catch (error) {
+      console.error('Error updating event:', error);
       enqueueSnackbar(ERROR_MESSAGES.SAVE_FAILED, { variant: 'error' });
     }
   };
@@ -127,5 +137,5 @@ export const useEventOperations = (editing: boolean, onSave?: () => void) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return { events, fetchEvents, saveEvent, deleteEvent, createRepeatEvent };
+  return { events, fetchEvents, saveEvent, editEvent, deleteEvent, createRepeatEvent };
 };

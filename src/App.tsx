@@ -40,6 +40,7 @@ import { findOverlappingEvents } from './utils/eventOverlap.ts';
 import { getTimeErrorMessage } from './utils/timeValidation.ts';
 import Calendar from './components/Calendar.tsx';
 import EventBox from './components/EventBox.tsx';
+import OverlappingConfirmDialog from './components/OverlappingConfirmDialog.tsx';
 
 export const notificationOptions = [
   { value: 1, label: '1분 전' },
@@ -306,6 +307,44 @@ function App() {
     resetForm();
   };
 
+  const handleOverlapClose = () => {
+    setIsOverlapDialogOpen(false);
+    if (pendingDrop) {
+      resetDragState();
+    }
+  };
+
+  const handleOverlapConfirmAction = async () => {
+    setIsOverlapDialogOpen(false);
+    // 드래그 앤 드롭인 경우
+    if (pendingDrop) {
+      await handleOverlapConfirm();
+    } else {
+      // 일반 일정 추가/수정
+      const eventData = {
+        title,
+        date,
+        startTime,
+        endTime,
+        description,
+        location,
+        category,
+        repeat: {
+          type: isRepeating ? repeatType : 'none',
+          interval: repeatInterval,
+          endDate: repeatEndDate || undefined,
+        },
+        notificationTime,
+      };
+
+      if (editingEvent) {
+        await updateEvent({ ...eventData, id: editingEvent.id } as Event);
+      } else {
+        await saveEvent(eventData);
+      }
+    }
+  };
+
   return (
     <Box sx={{ width: '100%', height: '100vh', margin: 'auto', p: 5 }}>
       <Stack direction="row" spacing={6} sx={{ height: '100%' }}>
@@ -550,76 +589,14 @@ function App() {
         </Stack>
       </Stack>
 
-      <Dialog
+      <OverlappingConfirmDialog
         open={isOverlapDialogOpen}
-        onClose={() => {
-          setIsOverlapDialogOpen(false);
-          // 드래그 앤 드롭 취소
-          if (pendingDrop) {
-            resetDragState();
-          }
-        }}
-      >
-        <DialogTitle>일정 겹침 경고</DialogTitle>
-        <DialogContent>
-          <DialogContentText>다음 일정과 겹칩니다:</DialogContentText>
-          {overlappingEvents.map((event) => (
-            <Typography key={event.id} sx={{ ml: 1, mb: 1 }}>
-              {event.title} ({event.date} {event.startTime}-{event.endTime})
-            </Typography>
-          ))}
-          <DialogContentText>계속 진행하시겠습니까?</DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => {
-              setIsOverlapDialogOpen(false);
-              // 드래그 앤 드롭 취소
-              if (pendingDrop) {
-                resetDragState();
-              }
-            }}
-          >
-            취소
-          </Button>
-          <Button
-            color="error"
-            onClick={async () => {
-              setIsOverlapDialogOpen(false);
-              // 드래그 앤 드롭인 경우
-              if (pendingDrop) {
-                await handleOverlapConfirm();
-              } else {
-                // 일반 일정 추가/수정
-                const eventData = {
-                  title,
-                  date,
-                  startTime,
-                  endTime,
-                  description,
-                  location,
-                  category,
-                  repeat: {
-                    type: isRepeating ? repeatType : 'none',
-                    interval: repeatInterval,
-                    endDate: repeatEndDate || undefined,
-                  },
-                  notificationTime,
-                };
+        onClose={handleOverlapClose}
+        overlappingEvents={overlappingEvents}
+        handleOverlapConfirmAction={handleOverlapConfirmAction}
+      />
 
-                if (editingEvent) {
-                  await updateEvent({ ...eventData, id: editingEvent.id } as Event);
-                } else {
-                  await saveEvent(eventData);
-                }
-              }
-            }}
-          >
-            계속 진행
-          </Button>
-        </DialogActions>
-      </Dialog>
-
+      {/* 반복 일정 수정/삭제 */}
       <RecurringEventDialog
         open={isRecurringDialogOpen}
         onClose={() => {
@@ -632,6 +609,7 @@ function App() {
         mode={recurringDialogMode}
       />
 
+      {/* drag and drop 확인 다이얼로그 */}
       <DragAndDropConfirmDialog
         open={isDragConfirmOpen}
         event={pendingDrop?.event || null}

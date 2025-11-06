@@ -8,6 +8,7 @@
     "server:watch": "node --watch server.js",
     "start": "vite",
     "dev": "concurrently \"pnpm run server:watch\" \"pnpm run start\"",
+    "dev:e2e": "TEST_ENV=e2e concurrently \"node server.js\" \"vite\"",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
@@ -17,7 +18,9 @@
     "lint": "pnpm lint:eslint && pnpm lint:tsc",
     "vitest-preview": "vitest-preview",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "playwright:test": "exec playwright test",
+    "playwright:ui": "exec playwright test --ui"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",

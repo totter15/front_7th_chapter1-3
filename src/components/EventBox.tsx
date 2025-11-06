@@ -1,7 +1,8 @@
 import { Delete, Edit, Notifications, Repeat } from '@mui/icons-material';
 import { Box, IconButton, Stack, Tooltip, Typography } from '@mui/material';
-import { Event, RepeatType } from '../types.ts';
+
 import { notificationOptions } from '../App.tsx';
+import { Event, RepeatType } from '../types.ts';
 
 const getRepeatTypeLabel = (type: RepeatType): string => {
   switch (type) {
@@ -30,7 +31,11 @@ const EventBox = ({
   handleDeleteEvent: (event: Event) => void;
 }) => {
   return (
-    <Box key={event.id} sx={{ border: 1, borderRadius: 2, p: 3, width: '100%' }}>
+    <Box
+      key={event.id}
+      data-testid={`event-box`}
+      sx={{ border: 1, borderRadius: 2, p: 3, width: '100%' }}
+    >
       <Stack direction="row" justifyContent="space-between">
         <Stack>
           <Stack direction="row" spacing={1} alignItems="center">

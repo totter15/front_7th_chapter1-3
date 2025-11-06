@@ -1,21 +1,5 @@
-import { test, expect, Page } from '@playwright/test';
-import * as fs from 'fs';
-import path from 'path';
-
-// 각 테스트 전에 데이터베이스 초기화
-const __dirname = path.resolve();
-
-test.beforeEach(async () => {
-  const storageStatePath = `${__dirname}/src/__mocks__/response/e2e.json`;
-  if (fs.existsSync(storageStatePath)) {
-    fs.writeFileSync(
-      storageStatePath,
-      JSON.stringify({
-        events: [],
-      })
-    );
-  }
-});
+import { test, expect } from './fixtures';
+import { Page } from '@playwright/test';
 
 const createEvent = async (
   page: Page,
@@ -57,14 +41,13 @@ const createEvent = async (
   await page.getByTestId('event-submit-button').click();
 };
 
-// 저장 -> 이벤트 리스트, 캘린더(주간뷰)에 조회됨
-// 저장 -> 이벤트 리스트, 캘린더(월간뷰)에 조회됨
-test('입력한 새로운 일정 정보에 맞춰 모든 필드가 이벤트 리스트에 정확히 저장된다.', async ({
+// 저장 -> 이벤트 리스트, 캘린더(주간뷰),캘린더(월간뷰)에 조회됨
+test('입력한 새로운 일정 정보에 맞춰 모든 필드가 이벤트 리스트, 캘린더(주간뷰),캘린더(월간뷰)에 정확히 저장된다.', async ({
   page,
 }) => {
   await createEvent(page, {
     title: '테스트 일정1',
-    date: '2025-11-01',
+    date: '2025-11-02',
     startTime: '10:00',
     endTime: '11:00',
     description: '테스트 설명1',
@@ -72,17 +55,34 @@ test('입력한 새로운 일정 정보에 맞춰 모든 필드가 이벤트 리
     category: '개인',
   });
 
+  // 이벤트 리스트에 조회됨
   const event = page.getByTestId('event-box').filter({ hasText: '테스트 일정1' });
 
-  expect(event.getByText('2025-11-01')).toBeVisible();
-  expect(event.getByText('10:00 - 11:00')).toBeVisible();
-  expect(event.getByText('테스트 설명1')).toBeVisible();
-  expect(event.getByText('테스트 위치1')).toBeVisible();
-  expect(event.getByText('카테고리: 개인')).toBeVisible();
+  await expect(event.getByText('2025-11-02')).toBeVisible();
+  await expect(event.getByText('10:00 - 11:00')).toBeVisible();
+  await expect(event.getByText('테스트 설명1')).toBeVisible();
+  await expect(event.getByText('테스트 위치1')).toBeVisible();
+  await expect(event.getByText('카테고리: 개인')).toBeVisible();
+
+  // 월간뷰에 조회됨
+  await page.getByLabel('뷰 타입 선택').click();
+  await page.getByRole('option', { name: 'Month' }).click();
+
+  const monthView = page.getByTestId('month-view');
+  await expect(monthView.getByText('테스트 일정1')).toBeVisible();
+
+  // 주간뷰에 조회됨
+  await page.getByLabel('뷰 타입 선택').click();
+  await page.getByRole('option', { name: 'week-option' }).click();
+
+  const weekView = page.getByTestId('week-view');
+  await expect(weekView.getByText('테스트 일정1')).toBeVisible();
 });
 
 // 저장 -> 수정
-test('기존 일정의 세부 정보를 수정하고 변경사항이 정확히 반영된다', async ({ page }) => {
+test('기존 일정의 세부 정보를 수정하고 변경사항이 이벤트 리스트, 캘린더(주간뷰),캘린더(월간뷰)에 반영된다', async ({
+  page,
+}) => {
   await createEvent(page, {
     title: '새 회의',
     date: '2025-11-02',
@@ -114,87 +114,55 @@ test('기존 일정의 세부 정보를 수정하고 변경사항이 정확히 �
   await page.getByRole('option', { name: `개인-option` }).click();
   await page.getByTestId('event-submit-button').click();
 
+  // 이벤트 리스트에 조회됨
   const changedEvent = page.getByTestId('event-box').filter({ hasText: '수정된 회의' });
 
-  expect(changedEvent.getByText('수정된 회의')).toBeVisible();
-  expect(changedEvent.getByText('15:00 - 16:00')).toBeVisible();
-  expect(changedEvent.getByText('회의 내용 변경')).toBeVisible();
-  expect(changedEvent.getByText('회의실 B')).toBeVisible();
-  expect(changedEvent.getByText('카테고리: 개인')).toBeVisible();
+  await expect(changedEvent.getByText('수정된 회의')).toBeVisible();
+  await expect(changedEvent.getByText('15:00 - 16:00')).toBeVisible();
+  await expect(changedEvent.getByText('회의 내용 변경')).toBeVisible();
+  await expect(changedEvent.getByText('회의실 B')).toBeVisible();
+  await expect(changedEvent.getByText('카테고리: 개인')).toBeVisible();
+
+  // 월간뷰에 조회됨
+  await page.getByLabel('뷰 타입 선택').click();
+  await page.getByRole('option', { name: 'Month' }).click();
+
+  const monthView = page.getByTestId('month-view');
+  await expect(monthView.getByText('수정된 회의')).toBeVisible();
+
+  // 주간뷰에 조회됨
+  await page.getByLabel('뷰 타입 선택').click();
+  await page.getByRole('option', { name: 'week-option' }).click();
+
+  const weekView = page.getByTestId('week-view');
+  await expect(weekView.getByText('수정된 회의')).toBeVisible();
 });
 
 // 저장 -> 삭제
-test('일정을 삭제하고 더 이상 조회되지 않는지 확인한다', async () => {
-  //   setupMockHandlerDeletion();
-  //   const { user } = setup(<App />);
-  //   const eventList = within(screen.getByTestId('event-list'));
-  //   expect(await eventList.findByText('삭제할 이벤트')).toBeInTheDocument();
-  //   // 삭제 버튼 클릭
-  //   const allDeleteButton = await screen.findAllByLabelText('Delete event');
-  //   await user.click(allDeleteButton[0]);
-  //   expect(eventList.queryByText('삭제할 이벤트')).not.toBeInTheDocument();
-  // });
-});
+test('일정을 삭제하고 더 이상 조회되지 않는지 확인한다', async ({ page }) => {
+  await createEvent(page, {
+    title: '삭제할 일정',
+    date: '2025-11-02',
+    startTime: '14:00',
+    endTime: '15:00',
+    description: '삭제할 일정입니다.',
+    location: '삭제할 위치',
+    category: '기타',
+  });
 
-test('주별 뷰를 선택 후 해당 주에 일정이 없으면, 일정이 표시되지 않는다.', async () => {
-  //   // ! 현재 시스템 시간 2025-10-01
-  //   const { user } = setup(<App />);
-  //   await user.click(within(screen.getByLabelText('뷰 타입 선택')).getByRole('combobox'));
-  //   await user.click(screen.getByRole('option', { name: 'week-option' }));
-  //   // ! 일정 로딩 완료 후 테스트
-  //   await screen.findByText('일정 로딩 완료!');
-  //   const eventList = within(screen.getByTestId('event-list'));
-  //   expect(eventList.getByText('검색 결과가 없습니다.')).toBeInTheDocument();
-});
+  const event = page.getByTestId('event-box').filter({ hasText: '삭제할 일정' });
+  await event.getByLabel('Delete event').click();
 
-test('주별 뷰 선택 후 해당 일자에 일정이 존재한다면 해당 일정이 정확히 표시된다', async () => {
-  //   setupMockHandlerCreation();
-  //   const { user } = setup(<App />);
-  //   await saveSchedule(user, {
-  //     title: '이번주 팀 회의',
-  //     date: '2025-10-02',
-  //     startTime: '09:00',
-  //     endTime: '10:00',
-  //     description: '이번주 팀 회의입니다.',
-  //     location: '회의실 A',
-  //     category: '업무',
-  //   });
-  //   await user.click(within(screen.getByLabelText('뷰 타입 선택')).getByRole('combobox'));
-  //   await user.click(screen.getByRole('option', { name: 'week-option' }));
-  //   const weekView = within(screen.getByTestId('week-view'));
-  //   expect(weekView.getByText('이번주 팀 회의')).toBeInTheDocument();
-});
+  await expect(event).not.toBeVisible();
 
-test('월별 뷰에 일정이 없으면, 일정이 표시되지 않아야 한다.', async () => {
-  //   vi.setSystemTime(new Date('2025-01-01'));
-  //   setup(<App />);
-  //   // ! 일정 로딩 완료 후 테스트
-  //   await screen.findByText('일정 로딩 완료!');
-  //   const eventList = within(screen.getByTestId('event-list'));
-  //   expect(eventList.getByText('검색 결과가 없습니다.')).toBeInTheDocument();
-});
+  // 월간뷰에 조회됨
+  const monthView = page.getByTestId('month-view');
+  await expect(monthView).not.toHaveText('삭제할 일정');
 
-test('월별 뷰에 일정이 정확히 표시되는지 확인한다', async () => {
-  //   setupMockHandlerCreation();
-  //   const { user } = setup(<App />);
-  //   await saveSchedule(user, {
-  //     title: '이번달 팀 회의',
-  //     date: '2025-10-02',
-  //     startTime: '09:00',
-  //     endTime: '10:00',
-  //     description: '이번달 팀 회의입니다.',
-  //     location: '회의실 A',
-  //     category: '업무',
-  //   });
-  //   const monthView = within(screen.getByTestId('month-view'));
-  //   expect(monthView.getByText('이번달 팀 회의')).toBeInTheDocument();
-});
+  // 주간뷰에 조회됨
+  await page.getByLabel('뷰 타입 선택').click();
+  await page.getByRole('option', { name: 'week-option' }).click();
 
-test('달력에 1월 1일(신정)이 공휴일로 표시되는지 확인한다', async () => {
-  //   vi.setSystemTime(new Date('2025-01-01'));
-  //   setup(<App />);
-  //   const monthView = screen.getByTestId('month-view');
-  //   // 1월 1일 셀 확인
-  //   const januaryFirstCell = within(monthView).getByText('1').closest('td')!;
-  //   expect(within(januaryFirstCell).getByText('신정')).toBeInTheDocument();
+  const weekView = page.getByTestId('week-view');
+  await expect(weekView).not.toHaveText('삭제할 일정');
 });

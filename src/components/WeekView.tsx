@@ -8,9 +8,11 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import { formatDate, formatWeek, getWeekDates } from '../utils/dateUtils';
+import React from 'react';
+
 import { Event } from '../types.ts';
 import CalendarCell from './CalendarCell';
+import { formatDate, formatWeek, getWeekDates } from '../utils/dateUtils';
 
 const WeekView = ({
   currentDate,
@@ -27,13 +29,13 @@ const WeekView = ({
   currentDate: Date;
   weekDays: string[];
   selectedDate: string;
-  handleDateCellClick: (dateString: string) => void;
+  handleDateCellClick: (_dateString: string) => void;
   filteredEvents: Event[];
   notifiedEvents: string[];
   draggedEvent: Event | null;
-  handleDragStart: (event: Event) => void;
-  handleDragOver: (e: React.DragEvent) => void;
-  handleDrop: (targetDate: string) => void;
+  handleDragStart: (_event: Event) => void;
+  handleDragOver: (_e: React.DragEvent) => void;
+  handleDrop: (_targetDate: string) => void;
 }) => {
   const weekDates = getWeekDates(currentDate);
 

@@ -1,4 +1,3 @@
-import { formatMonth, getWeeksAtMonth } from '../utils/dateUtils';
 import {
   Stack,
   Typography,
@@ -9,9 +8,12 @@ import {
   TableRow,
   TableCell,
 } from '@mui/material';
-import { formatDate, getEventsForDay } from '../utils/dateUtils';
+import React from 'react';
+
 import { Event } from '../types';
 import CalendarCell from './CalendarCell';
+import { formatDate, getEventsForDay } from '../utils/dateUtils';
+import { formatMonth, getWeeksAtMonth } from '../utils/dateUtils';
 
 const MonthView = ({
   currentDate,
@@ -29,13 +31,13 @@ const MonthView = ({
   currentDate: Date;
   weekDays: string[];
   selectedDate: string;
-  handleDateCellClick: (dateString: string) => void;
+  handleDateCellClick: (_dateString: string) => void;
   filteredEvents: Event[];
   notifiedEvents: string[];
   draggedEvent: Event | null;
-  handleDragStart: (event: Event) => void;
-  handleDragOver: (e: React.DragEvent) => void;
-  handleDrop: (targetDate: string) => void;
+  handleDragStart: (_event: Event) => void;
+  handleDragOver: (_e: React.DragEvent) => void;
+  handleDrop: (_targetDate: string) => void;
   holidays: { [key: string]: string };
 }) => {
   const weeks = getWeeksAtMonth(currentDate);

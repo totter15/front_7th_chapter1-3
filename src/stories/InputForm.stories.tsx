@@ -1,8 +1,8 @@
+import { Stack } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
+
 import InputForm from '../components/InputForm';
-import { Stack } from '@mui/material';
-import { useState } from 'react';
 
 const meta = {
   title: 'InputForm',

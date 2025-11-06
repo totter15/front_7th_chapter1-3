@@ -91,7 +91,7 @@ it("새로 정의된 'title', 'endTime' 기준으로 적절하게 일정이 업�
   };
 
   await act(async () => {
-    await result.current.saveEvent(updatedEvent);
+    await result.current.editEvent(updatedEvent);
   });
 
   expect(result.current.events[0]).toEqual(updatedEvent);

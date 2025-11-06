@@ -1,5 +1,5 @@
-import { createEvent } from './utils';
 import { test, expect } from './fixtures';
+import { createEvent } from './utils';
 
 test('월간뷰에서 일정을 드래그하여 다른 날짜로 이동하고 저장하면 일정이 새 날짜에 표시된다', async ({
   page,

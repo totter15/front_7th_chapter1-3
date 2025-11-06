@@ -11,7 +11,7 @@ interface SelectFormProps {
   label: string;
   labelId?: string;
   value: string | number;
-  onChange: (value: string | number) => void;
+  onChange: (_value: string | number) => void;
   options: SelectOption[];
   ariaLabel?: string;
   fullWidth?: boolean;
@@ -53,4 +53,3 @@ const SelectForm = ({
 };
 
 export default SelectForm;
-

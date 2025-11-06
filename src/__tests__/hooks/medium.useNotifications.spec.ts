@@ -18,7 +18,7 @@ it('지정된 시간이 된 경우 알림이 새롭게 생성되어 추가된다
   const notificationTime = 5;
   const mockEvents: Event[] = [
     {
-      id: 1,
+      id: '1',
       title: '테스트 이벤트',
       date: formatDate(new Date()),
       startTime: parseHM(Date.now() + 10 * 분),
@@ -42,7 +42,7 @@ it('지정된 시간이 된 경우 알림이 새롭게 생성되어 추가된다
   });
 
   expect(result.current.notifications).toHaveLength(1);
-  expect(result.current.notifiedEvents).toContain(1);
+  expect(result.current.notifiedEvents).toContain('1');
 });
 
 it('index를 기준으로 알림을 적절하게 제거할 수 있다', () => {

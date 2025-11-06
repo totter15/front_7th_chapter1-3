@@ -1,10 +1,10 @@
 import { test as base } from '@playwright/test';
+
 import { cleanupAllEvents } from './utils';
 
-type Fixtures = {
-  // 자동으로 시스템 시간이 설정된 page를 제공
-};
+type Fixtures = Record<string, never>;
 
+/* eslint-disable react-hooks/rules-of-hooks */
 export const test = base.extend<Fixtures>({
   page: async ({ page, request }, use) => {
     await cleanupAllEvents(request);
@@ -15,5 +15,6 @@ export const test = base.extend<Fixtures>({
     await use(page);
   },
 });
+/* eslint-enable react-hooks/rules-of-hooks */
 
 export { expect } from '@playwright/test';

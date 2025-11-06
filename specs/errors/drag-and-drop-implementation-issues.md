@@ -233,3 +233,8 @@ const continueButton = screen.getByRole('button', { name: '계속 진행' });
 - [ ] testId를 사용하기 전에 해당 testId가 실제로 필요한지 확인했는가?
 
 
+
+
+
+
+

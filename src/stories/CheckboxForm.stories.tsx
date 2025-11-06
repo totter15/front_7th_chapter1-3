@@ -1,7 +1,8 @@
+import { Stack } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
+
 import CheckboxForm from '../components/CheckboxForm';
-import { Stack } from '@mui/material';
 
 const meta = {
   title: 'CheckboxForm',

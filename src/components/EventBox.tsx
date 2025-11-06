@@ -27,8 +27,8 @@ const EventBox = ({
 }: {
   event: Event;
   isNotifiedEvent: boolean;
-  handleEditEvent: (event: Event) => void;
-  handleDeleteEvent: (event: Event) => void;
+  handleEditEvent: (_event: Event) => void;
+  handleDeleteEvent: (_event: Event) => void;
 }) => {
   return (
     <Box

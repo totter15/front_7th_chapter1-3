@@ -1,5 +1,5 @@
-import { createEvent } from './utils';
 import { test, expect } from './fixtures';
+import { createEvent } from './utils';
 
 test('월간뷰에서 날짜 셀 클릭 시 날짜가 자동으로 채워지며, 일정 저장시 해당날짜에 일정이 생성된다', async ({
   page,

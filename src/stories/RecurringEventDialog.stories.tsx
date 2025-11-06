@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
+
 import RecurringEventDialog from '../components/RecurringEventDialog';
 
 const meta = {
@@ -97,4 +98,3 @@ export const Closed: Story = {
     open: false,
   },
 };
-

@@ -1,10 +1,11 @@
 import { FormControl, Tooltip, TextField, FormLabel } from '@mui/material';
+import React from 'react';
 
 interface InputFormProps {
   id: string;
   label: string;
   value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange: (_e: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur?: () => void;
   error?: string | boolean | null;
   type?: 'text' | 'date' | 'time';

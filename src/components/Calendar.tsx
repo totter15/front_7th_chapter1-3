@@ -1,5 +1,7 @@
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import { Typography, Stack, IconButton, Select, MenuItem } from '@mui/material';
+import React from 'react';
+
 import WeekView from './WeekView';
 import { Event } from '../types.ts';
 import MonthView from './MonthView';
@@ -21,18 +23,18 @@ const Calendar = ({
   holidays,
 }: {
   view: 'week' | 'month';
-  setView: (view: 'week' | 'month') => void;
+  setView: (_view: 'week' | 'month') => void;
   currentDate: Date;
   weekDays: string[];
   selectedDate: string;
-  handleDateCellClick: (dateString: string) => void;
+  handleDateCellClick: (_dateString: string) => void;
   filteredEvents: Event[];
   notifiedEvents: string[];
   draggedEvent: Event | null;
-  handleDragStart: (event: Event) => void;
-  handleDragOver: (e: React.DragEvent) => void;
-  handleDrop: (targetDate: string) => void;
-  navigate: (direction: 'prev' | 'next') => void;
+  handleDragStart: (_event: Event) => void;
+  handleDragOver: (_e: React.DragEvent) => void;
+  handleDrop: (_targetDate: string) => void;
+  navigate: (_direction: 'prev' | 'next') => void;
   holidays: { [key: string]: string };
 }) => {
   return (

@@ -19,4 +19,3 @@ const CheckboxForm = ({ checked, onChange, label, fullWidth = false }: CheckboxF
 };
 
 export default CheckboxForm;
-

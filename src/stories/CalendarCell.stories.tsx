@@ -1,7 +1,8 @@
+import { Table, TableBody, TableRow } from '@mui/material';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
+
 import CalendarCell from '../components/CalendarCell';
-import { Table, TableBody, TableRow } from '@mui/material';
 
 const meta = {
   title: 'CalendarCell',

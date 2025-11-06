@@ -1,5 +1,7 @@
 import { Notifications, Repeat } from '@mui/icons-material';
 import { Box, Stack, TableCell, Tooltip, Typography } from '@mui/material';
+import React from 'react';
+
 import { Event, RepeatType } from '../types';
 
 interface CalendarCellProps {
@@ -9,10 +11,10 @@ interface CalendarCellProps {
   events: Event[];
   notifiedEvents: string[];
   draggedEvent: Event | null;
-  handleDateCellClick: (dateString: string) => void;
-  handleDragStart: (event: Event) => void;
-  handleDragOver: (e: React.DragEvent) => void;
-  handleDrop: (targetDate: string) => void;
+  handleDateCellClick: (_dateString: string) => void;
+  handleDragStart: (_event: Event) => void;
+  handleDragOver: (_e: React.DragEvent) => void;
+  handleDrop: (_targetDate: string) => void;
   holiday?: string;
 }
 

@@ -30,8 +30,8 @@ const createUpdatedEvent = ({
 };
 
 export const useDragAndDrop = (
-  onConfirm: (updatedEvent: Event) => Promise<void>,
-  onConfirmOpen: (updatedEvent: Event) => void,
+  onConfirm: (_updatedEvent: Event) => Promise<void>,
+  onConfirmOpen: (_updatedEvent: Event) => void,
   onConfirmClose: () => void
 ) => {
   const [draggedEvent, setDraggedEvent] = useState<Event | null>(null);

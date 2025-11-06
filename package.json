@@ -9,7 +9,7 @@
     "start": "vite",
     "dev": "concurrently \"pnpm run server:watch\" \"pnpm run start\"",
     "dev:e2e": "TEST_ENV=e2e concurrently \"node server.js\" \"vite\"",
-    "test": "pnpm run test:unit & pnpm run test:e2e",
+    "test": "pnpm exec playwright install && pnpm run test:unit & pnpm run test:e2e",
     "test:unit": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",

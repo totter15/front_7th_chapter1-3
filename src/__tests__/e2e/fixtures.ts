@@ -6,7 +6,7 @@ type Fixtures = {
 
 export const test = base.extend<Fixtures>({
   page: async ({ page }, use) => {
-    await page.clock.setSystemTime(new Date('2025-11-01T00:00:00Z'));
+    await page.clock.setSystemTime(new Date('2025-11-02T00:00:00Z'));
 
     await use(page);
   },

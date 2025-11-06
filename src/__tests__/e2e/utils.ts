@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { APIRequestContext, Page } from '@playwright/test';
 import { EventForm, RepeatInfo } from '../../types';
 
 type EventFormWithNotificationTime = Omit<EventForm, 'notificationTime' | 'repeat'> & {
@@ -61,4 +61,9 @@ export const filledEventForm = async (
       await page.getByRole('textbox', { name: '반복 종료일' }).fill(repeat.endDate!);
     }
   }
+};
+
+export const cleanupAllEvents = async (request: APIRequestContext) => {
+  const response = await request.put('http://localhost:3000/api/events/reset');
+  return response;
 };

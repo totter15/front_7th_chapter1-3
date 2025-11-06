@@ -45,9 +45,6 @@ importers:
       '@eslint/js':
         specifier: 9.34.0
         version: 9.34.0
-      '@playwright/test':
-        specifier: ^1.56.1
-        version: 1.56.1
       '@storybook/addon-a11y':
         specifier: ^10.0.3
         version: 10.0.3(storybook@10.0.3(@testing-library/dom@10.4.0)(msw@2.10.3(@types/node@22.18.8)(typescript@5.6.3))(prettier@3.3.3)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(vite@7.0.2(@types/node@22.18.8)))
@@ -63,6 +60,9 @@ importers:
       '@storybook/react-vite':
         specifier: ^10.0.3
         version: 10.0.3(esbuild@0.25.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(rollup@4.44.1)(storybook@10.0.3(@testing-library/dom@10.4.0)(msw@2.10.3(@types/node@22.18.8)(typescript@5.6.3))(prettier@3.3.3)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(vite@7.0.2(@types/node@22.18.8)))(typescript@5.6.3)(vite@7.0.2(@types/node@22.18.8))
+      '@playwright/test':
+        specifier: ^1.56.1
+        version: 1.56.1
       '@testing-library/jest-dom':
         specifier: ^6.6.3
         version: 6.6.3
@@ -2404,10 +2404,13 @@ packages:
     resolution: {integrity: sha512-zJ2mQYM18rEFOudeV4GShTGIQ7RbzA7ozbU9I/XBpm7kqgMywgmylMwXHxZJmkVoYkna9d2pVXVXPdYTP9ej8Q==}
     engines: {node: '>= 0.6'}
 
+<<<<<<< HEAD
   fresh@2.0.0:
     resolution: {integrity: sha512-Rx/WycZ60HOaqLKAi6cHRKKI7zxWbJ31MhntmtwMoaTeF7XFH9hhBp8vITaMidfljRQ6eYWCKkaTK+ykVJHP2A==}
     engines: {node: '>= 0.8'}
 
+=======
+>>>>>>> e2e
   fsevents@2.3.2:
     resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
@@ -3232,10 +3235,13 @@ packages:
     resolution: {integrity: sha512-M7BAV6Rlcy5u+m6oPhAPFgJTzAioX/6B0DxyvDlo9l8+T3nLKbrczg2WLUyzd45L8RqfUMyGPzekbMvX2Ldkwg==}
     engines: {node: '>=12'}
 
+<<<<<<< HEAD
   picomatch@4.0.3:
     resolution: {integrity: sha512-5gTmgEY/sqK6gFXLIsQNH19lWb4ebPDLA4SdLP7dsWkIXHWlG66oPuVvXSGFPppYZz8ZDZq0dYYrbHfBCVUb1Q==}
     engines: {node: '>=12'}
 
+=======
+>>>>>>> e2e
   playwright-core@1.56.1:
     resolution: {integrity: sha512-hutraynyn31F+Bifme+Ps9Vq59hKuUCz7H1kDOcBs+2oGguKkWTU50bBWrtz34OUWmIwpBTWDxaRPXrIXkgvmQ==}
     engines: {node: '>=18'}
@@ -6740,8 +6746,11 @@ snapshots:
 
   fresh@0.5.2: {}
 
+<<<<<<< HEAD
   fresh@2.0.0: {}
 
+=======
+>>>>>>> e2e
   fsevents@2.3.2:
     optional: true
 
@@ -7594,8 +7603,11 @@ snapshots:
 
   picomatch@4.0.2: {}
 
+<<<<<<< HEAD
   picomatch@4.0.3: {}
 
+=======
+>>>>>>> e2e
   playwright-core@1.56.1: {}
 
   playwright@1.56.1:

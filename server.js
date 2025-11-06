@@ -19,6 +19,17 @@ const getEvents = async () => {
   return JSON.parse(data);
 };
 
+app.put('/api/events/reset', async (_, res) => {
+  fs.writeFileSync(
+    `${__dirname}/src/__mocks__/response/${dbName}`,
+    JSON.stringify({
+      events: [],
+    })
+  );
+
+  res.status(204).send();
+});
+
 app.get('/api/events', async (_, res) => {
   const events = await getEvents();
   res.json(events);
